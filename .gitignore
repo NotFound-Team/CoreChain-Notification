@@ -1,4 +1,6 @@
 # Environment variables
+configs/config.yaml
+corechain-e1321-firebase-adminsdk-fbsvc-a0aa4d8c4c.json
 .env
 .env.local
 .env.*.local

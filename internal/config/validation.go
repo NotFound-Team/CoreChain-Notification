@@ -5,7 +5,6 @@ import (
 	"fmt"
 )
 
-// Validate checks if the configuration is valid
 func (c *Config) Validate() error {
 	if err := c.Database.Validate(); err != nil {
 		return fmt.Errorf("database config: %w", err)
@@ -26,7 +25,6 @@ func (c *Config) Validate() error {
 	return nil
 }
 
-// Validate validates server configuration
 func (s *ServerConfig) Validate() error {
 	if s.Port <= 0 || s.Port > 65535 {
 		return errors.New("invalid server port")
@@ -34,7 +32,6 @@ func (s *ServerConfig) Validate() error {
 	return nil
 }
 
-// Validate validates database configuration
 func (d *DatabaseConfig) Validate() error {
 	if d.Host == "" {
 		return errors.New("database host is required")
@@ -51,7 +48,6 @@ func (d *DatabaseConfig) Validate() error {
 	return nil
 }
 
-// Validate validates Kafka configuration
 func (k *KafkaConfig) Validate() error {
 	if len(k.Brokers) == 0 {
 		return errors.New("at least one Kafka broker is required")
@@ -65,7 +61,6 @@ func (k *KafkaConfig) Validate() error {
 	return nil
 }
 
-// Validate validates FCM configuration
 func (f *FCMConfig) Validate() error {
 	if f.CredentialsPath == "" {
 		return errors.New("FCM credentials path is required")

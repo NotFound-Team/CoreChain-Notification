@@ -6,13 +6,8 @@ import (
 	"github.com/corechain/notification-service/pkg/constants"
 )
 
-// NotificationType represents the type of notification
 type NotificationType = constants.NotificationType
-
-// NotificationStatus represents the delivery status
 type NotificationStatus = constants.NotificationStatus
-
-// Notification represents a notification entity
 type Notification struct {
 	ID               string                        `json:"id"`
 	NotificationType NotificationType              `json:"notification_type"`
@@ -31,14 +26,12 @@ type Notification struct {
 	Priority         int                           `json:"priority,omitempty"`
 }
 
-// UserInfo represents user information from MongoDB
 type UserInfo struct {
 	ID    string `json:"_id"`
 	Email string `json:"email"`
 	Name  string `json:"name,omitempty"`
 }
 
-// Task represents a task from the NestJS backend
 type Task struct {
 	ID          string     `json:"_id"`
 	Title       string     `json:"title"`
@@ -59,7 +52,6 @@ type Task struct {
 	DeletedBy   *UserInfo  `json:"deletedBy,omitempty"`
 }
 
-// Message represents a message notification (future implementation)
 type Message struct {
 	ID        string    `json:"_id"`
 	Content   string    `json:"content"`
@@ -67,7 +59,6 @@ type Message struct {
 	CreatedAt time.Time `json:"createdAt"`
 }
 
-// Call represents a call notification (future implementation)
 type Call struct {
 	ID       string `json:"_id"`
 	CallerID string `json:"callerId"`

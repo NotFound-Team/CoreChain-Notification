@@ -11,19 +11,16 @@ import (
 	"go.uber.org/zap"
 )
 
-// TaskHandler handles task-related Kafka messages
 type TaskHandler struct {
 	taskNotificationService *services.TaskNotificationService
 }
 
-// NewTaskHandler creates a new task handler
 func NewTaskHandler(taskNotificationService *services.TaskNotificationService) *TaskHandler {
 	return &TaskHandler{
 		taskNotificationService: taskNotificationService,
 	}
 }
 
-// HandleTaskCreated handles task.created events
 func (h *TaskHandler) HandleTaskCreated(ctx context.Context, message []byte) error {
 	logger.Debug("Processing task.created event", zap.Int("message_size", len(message)))
 
@@ -42,13 +39,11 @@ func (h *TaskHandler) HandleTaskCreated(ctx context.Context, message []byte) err
 		zap.String("title", event.Data.Title),
 	)
 
-	// Validate event
 	if err := h.validateTaskCreatedEvent(&event); err != nil {
 		logger.Error("Invalid task.created event", zap.Error(err))
 		return err
 	}
 
-	// Process the event
 	if err := h.taskNotificationService.ProcessTaskCreatedEvent(ctx, &event); err != nil {
 		logger.Error("Failed to process task.created event",
 			zap.Error(err),
@@ -64,7 +59,6 @@ func (h *TaskHandler) HandleTaskCreated(ctx context.Context, message []byte) err
 	return nil
 }
 
-// HandleTaskUpdated handles task.updated events (future)
 func (h *TaskHandler) HandleTaskUpdated(ctx context.Context, message []byte) error {
 	logger.Debug("Processing task.updated event", zap.Int("message_size", len(message)))
 
@@ -82,7 +76,6 @@ func (h *TaskHandler) HandleTaskUpdated(ctx context.Context, message []byte) err
 		zap.String("title", event.Data.Title),
 	)
 
-	// Process the event
 	if err := h.taskNotificationService.ProcessTaskUpdatedEvent(ctx, &event); err != nil {
 		logger.Error("Failed to process task.updated event",
 			zap.Error(err),

@@ -61,7 +61,10 @@ services:
       context: ../..
       dockerfile: deployments/docker/Dockerfile
     container_name: notification-service
-    depends_on:
+    volumes:
+      - ./corechain-e1321-firebase-adminsdk-fbsvc-a0aa4d8c4c.json:/root/corechain-e1321-firebase-adminsdk-fbsvc-a0aa4d8c4c.json
+      - ./config/config.yaml:/app/config/config.yaml
+    depends_on:~
       postgres:
         condition: service_healthy
       kafka:
@@ -83,7 +86,7 @@ services:
       KAFKA_TOPIC_INCOMING_CALL: call.incoming
       
       # FCM
-      FCM_CREDENTIALS_PATH: /root/google-services.json
+      FCM_CREDENTIALS_PATH: /root/corechain-e1321-firebase-adminsdk-fbsvc-a0aa4d8c4c.json
       FCM_PROJECT_ID: corechain-e1321
       
       # Application
@@ -92,8 +95,6 @@ services:
       SERVER_PORT: 8080
     ports:
       - "8080:8080"
-    volumes:
-      - ../../google-services.json:/root/google-services.json:ro
     networks:
       - notification-network
     restart: unless-stopped

@@ -12,13 +12,11 @@ import (
 	"go.uber.org/zap"
 )
 
-// NotificationService handles core notification business logic
 type NotificationService struct {
 	repository interfaces.NotificationRepository
 	fcmClient  interfaces.FCMClient
 }
 
-// NewNotificationService creates a new notification service
 func NewNotificationService(repo interfaces.NotificationRepository, fcmClient interfaces.FCMClient) *NotificationService {
 	return &NotificationService{
 		repository: repo,
@@ -26,7 +24,6 @@ func NewNotificationService(repo interfaces.NotificationRepository, fcmClient in
 	}
 }
 
-// CreateAndSendNotification creates a notification record and sends it via FCM
 func (s *NotificationService) CreateAndSendNotification(ctx context.Context, notification *models.Notification) error {
 	notification.CreatedAt = time.Now()
 	notification.Status = constants.StatusPending
@@ -45,7 +42,6 @@ func (s *NotificationService) CreateAndSendNotification(ctx context.Context, not
 		zap.String("user_id", notification.UserID),
 	)
 
-	// Convert data map to string map for FCM
 	dataMap := make(map[string]string)
 	for k, v := range notification.Data {
 		dataMap[k] = fmt.Sprintf("%v", v)
@@ -86,15 +82,11 @@ func (s *NotificationService) CreateAndSendNotification(ctx context.Context, not
 	return nil
 }
 
-// GetUserNotifications retrieves notifications for a user
 func (s *NotificationService) GetUserNotifications(ctx context.Context, userID string, limit, offset int) ([]*models.Notification, error) {
 	return s.repository.GetByUserID(ctx, userID, limit, offset)
 }
 
-// RetryFailedNotifications retries sending failed notifications
 func (s *NotificationService) RetryFailedNotifications(ctx context.Context, maxRetries int) error {
-	// This would be called by a background job
-	// Get pending/failed notifications
 	notifications, err := s.repository.GetPendingNotifications(ctx, 100)
 	if err != nil {
 		return err

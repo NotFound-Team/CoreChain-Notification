@@ -11,7 +11,6 @@ import (
 	"gorm.io/gorm"
 )
 
-// NotificationEntity represents the database entity
 type NotificationEntity struct {
 	ID               string    `gorm:"primaryKey;type:uuid;default:uuid_generate_v4()"`
 	NotificationType string    `gorm:"column:notification_type;type:varchar(50);not null"`
@@ -30,17 +29,14 @@ type NotificationEntity struct {
 	Priority         int       `gorm:"column:priority"`
 }
 
-// TableName specifies the table name
 func (NotificationEntity) TableName() string {
 	return "notifications"
 }
 
-// NotificationRepository implements the repository interface
 type NotificationRepository struct {
 	db *gorm.DB
 }
 
-// NewNotificationRepository creates a new notification repository
 func NewNotificationRepository(dsn string) (*NotificationRepository, error) {
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
@@ -50,7 +46,6 @@ func NewNotificationRepository(dsn string) (*NotificationRepository, error) {
 	return &NotificationRepository{db: db}, nil
 }
 
-// Create saves a new notification record
 func (r *NotificationRepository) Create(ctx context.Context, notification *models.Notification) error {
 	entity := r.toEntity(notification)
 	
@@ -62,7 +57,6 @@ func (r *NotificationRepository) Create(ctx context.Context, notification *model
 	return nil
 }
 
-// Update updates an existing notification
 func (r *NotificationRepository) Update(ctx context.Context, notification *models.Notification) error {
 	entity := r.toEntity(notification)
 	
@@ -73,7 +67,6 @@ func (r *NotificationRepository) Update(ctx context.Context, notification *model
 	return nil
 }
 
-// GetByID retrieves a notification by ID
 func (r *NotificationRepository) GetByID(ctx context.Context, id string) (*models.Notification, error) {
 	var entity NotificationEntity
 	
@@ -87,7 +80,6 @@ func (r *NotificationRepository) GetByID(ctx context.Context, id string) (*model
 	return r.toModel(&entity)
 }
 
-// GetByUserID retrieves notifications for a specific user
 func (r *NotificationRepository) GetByUserID(ctx context.Context, userID string, limit, offset int) ([]*models.Notification, error) {
 	var entities []NotificationEntity
 	
@@ -113,7 +105,6 @@ func (r *NotificationRepository) GetByUserID(ctx context.Context, userID string,
 	return notifications, nil
 }
 
-// GetPendingNotifications retrieves all pending notifications
 func (r *NotificationRepository) GetPendingNotifications(ctx context.Context, limit int) ([]*models.Notification, error) {
 	var entities []NotificationEntity
 	
@@ -138,7 +129,6 @@ func (r *NotificationRepository) GetPendingNotifications(ctx context.Context, li
 	return notifications, nil
 }
 
-// UpdateStatus updates the status of a notification
 func (r *NotificationRepository) UpdateStatus(ctx context.Context, id string, status string, errorMsg string) error {
 	updates := map[string]interface{}{
 		"status": status,
@@ -160,7 +150,6 @@ func (r *NotificationRepository) UpdateStatus(ctx context.Context, id string, st
 	return nil
 }
 
-// toEntity converts domain model to database entity
 func (r *NotificationRepository) toEntity(notification *models.Notification) *NotificationEntity {
 	entity := &NotificationEntity{
 		ID:               notification.ID,
@@ -187,7 +176,6 @@ func (r *NotificationRepository) toEntity(notification *models.Notification) *No
 	return entity
 }
 
-// toModel converts database entity to domain model
 func (r *NotificationRepository) toModel(entity *NotificationEntity) (*models.Notification, error) {
 	notification := &models.Notification{
 		ID:               entity.ID,
@@ -217,7 +205,6 @@ func (r *NotificationRepository) toModel(entity *NotificationEntity) (*models.No
 	return notification, nil
 }
 
-// Close closes the database connection
 func (r *NotificationRepository) Close() error {
 	sqlDB, err := r.db.DB()
 	if err != nil {

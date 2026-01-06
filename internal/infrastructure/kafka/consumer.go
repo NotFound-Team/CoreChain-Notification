@@ -12,7 +12,6 @@ import (
 	"go.uber.org/zap"
 )
 
-// Consumer implements the Kafka consumer interface
 type Consumer struct {
 	readers  map[string]*kafkago.Reader
 	handlers map[string]interfaces.MessageHandler
@@ -22,14 +21,12 @@ type Consumer struct {
 	mu       sync.RWMutex
 }
 
-// ConsumerConfig holds Kafka consumer configuration
 type ConsumerConfig struct {
 	Brokers []string
 	GroupID string
 	Topics  []string
 }
 
-// NewConsumer creates a new Kafka consumer
 func NewConsumer(config ConsumerConfig) *Consumer {
 	ctx, cancel := context.WithCancel(context.Background())
 	
@@ -55,7 +52,6 @@ func NewConsumer(config ConsumerConfig) *Consumer {
 	return consumer
 }
 
-// RegisterHandler registers a handler for a specific topic
 func (c *Consumer) RegisterHandler(topic string, handler interfaces.MessageHandler) error {
 	c.mu.Lock()
 	defer c.mu.Unlock()
@@ -70,7 +66,6 @@ func (c *Consumer) RegisterHandler(topic string, handler interfaces.MessageHandl
 	return nil
 }
 
-// Start begins consuming messages from Kafka
 func (c *Consumer) Start(ctx context.Context) error {
 	c.mu.RLock()
 	defer c.mu.RUnlock()
@@ -91,7 +86,6 @@ func (c *Consumer) Start(ctx context.Context) error {
 	return nil
 }
 
-// consumeTopic consumes messages from a specific topic
 func (c *Consumer) consumeTopic(ctx context.Context, topic string, reader *kafkago.Reader, handler interfaces.MessageHandler) {
 	defer c.wg.Done()
 

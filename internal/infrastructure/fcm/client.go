@@ -11,15 +11,18 @@ import (
 	"google.golang.org/api/option"
 )
 
-// Client implements the FCM client interface
 type Client struct {
 	messagingClient *messaging.Client
 }
 
-// NewClient creates a new FCM client
-func NewClient(ctx context.Context, credentialsPath string) (*Client, error) {
+func NewClient(ctx context.Context, credentialsPath string, projectID string) (*Client, error) {
 	opt := option.WithCredentialsFile(credentialsPath)
-	app, err := firebase.NewApp(ctx, nil, opt)
+	
+	config := &firebase.Config{
+		ProjectID: projectID,
+	}
+	
+	app, err := firebase.NewApp(ctx, config, opt)
 	if err != nil {
 		return nil, errors.NewFCMError("failed to initialize Firebase app", err)
 	}
@@ -34,7 +37,6 @@ func NewClient(ctx context.Context, credentialsPath string) (*Client, error) {
 	}, nil
 }
 
-// SendNotification sends a single notification via FCM
 func (c *Client) SendNotification(ctx context.Context, token string, title string, body string, data map[string]string) error {
 	message := &messaging.Message{
 		Token: token,
@@ -65,13 +67,11 @@ func (c *Client) SendNotification(ctx context.Context, token string, title strin
 		return errors.NewFCMError(fmt.Sprintf("failed to send FCM notification to token %s", token), err)
 	}
 
-	// Log successful send
 	_ = response // Response contains message ID
 
 	return nil
 }
 
-// SendBatchNotifications sends multiple notifications via FCM
 func (c *Client) SendBatchNotifications(ctx context.Context, notifications []interfaces.FCMMessage) error {
 	if len(notifications) == 0 {
 		return nil

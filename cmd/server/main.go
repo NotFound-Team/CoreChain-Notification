@@ -47,7 +47,7 @@ func main() {
 	logger.Info("Successfully connected to PostgreSQL")
 
 	logger.Info("Initializing FCM client...")
-	fcmClient, err := fcm.NewClient(ctx, cfg.FCM.CredentialsPath)
+	fcmClient, err := fcm.NewClient(ctx, cfg.FCM.CredentialsPath, cfg.FCM.ProjectID)
 	if err != nil {
 		logger.Fatal("Failed to initialize FCM client", zap.Error(err))
 	}
