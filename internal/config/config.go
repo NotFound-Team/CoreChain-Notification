@@ -2,8 +2,10 @@ package config
 
 import (
 	"fmt"
+	"os"
 	"strings"
 
+	"github.com/joho/godotenv"
 	"github.com/spf13/viper"
 )
 
@@ -66,24 +68,29 @@ type RetryConfig struct {
 	DelaySeconds int `mapstructure:"delay_seconds"`
 }
 
-// Load reads configuration from environment variables and config files
+// Load reads configuration from .env file and environment variables
 func Load() (*Config, error) {
-	viper.SetConfigName("config")
-	viper.SetConfigType("yaml")
-	viper.AddConfigPath("./configs")
-	viper.AddConfigPath(".")
+	// Try to load .env file (optional - will use system env vars if not found)
+	if err := godotenv.Load(); err != nil {
+		// .env file not found, will use system environment variables
+		// This is normal on platforms like Render where env vars are set directly
+		if !os.IsNotExist(err) {
+			fmt.Printf("Warning: Error loading .env file: %v\n", err)
+		}
+	}
 
+	// Set default values
 	viper.SetDefault("server.port", 8080)
 	viper.SetDefault("server.env", "development")
 	viper.SetDefault("logger.level", "info")
 	viper.SetDefault("retry.max_attempts", 3)
 	viper.SetDefault("retry.delay_seconds", 5)
 
-	viper.SetEnvPrefix("")
-	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
+	// Enable environment variable reading
 	viper.AutomaticEnv()
+	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
 
-	// Environment variable bindings
+	// Bind environment variables to config fields
 	viper.BindEnv("server.port", "SERVER_PORT")
 	viper.BindEnv("server.env", "APP_ENV")
 	viper.BindEnv("database.host", "DB_HOST")
@@ -105,21 +112,42 @@ func Load() (*Config, error) {
 	viper.BindEnv("retry.max_attempts", "MAX_RETRY_ATTEMPTS")
 	viper.BindEnv("retry.delay_seconds", "RETRY_DELAY_SECONDS")
 
-	if err := viper.ReadInConfig(); err != nil {
-		if _, ok := err.(viper.ConfigFileNotFoundError); !ok {
-			return nil, fmt.Errorf("error reading config file: %w", err)
-		}
-		// Config file not found; using environment variables only
-	}
-
+	// Create config struct and populate from environment
 	var config Config
-	if err := viper.Unmarshal(&config); err != nil {
-		return nil, fmt.Errorf("unable to decode config: %w", err)
-	}
-
-	if brokersStr := viper.GetString("KAFKA_BROKERS"); brokersStr != "" {
+	
+	// Manually set values from environment variables
+	config.Server.Port = viper.GetInt("server.port")
+	config.Server.Env = viper.GetString("server.env")
+	
+	config.Database.Host = viper.GetString("database.host")
+	config.Database.Port = viper.GetInt("database.port")
+	config.Database.User = viper.GetString("database.user")
+	config.Database.Password = viper.GetString("database.password")
+	config.Database.DBName = viper.GetString("database.dbname")
+	config.Database.SSLMode = viper.GetString("database.sslmode")
+	
+	// Handle KAFKA_BROKERS which can be comma-separated
+	if brokersStr := viper.GetString("kafka.brokers"); brokersStr != "" {
 		config.Kafka.Brokers = strings.Split(brokersStr, ",")
+		// Trim whitespace from each broker
+		for i, broker := range config.Kafka.Brokers {
+			config.Kafka.Brokers[i] = strings.TrimSpace(broker)
+		}
 	}
+	config.Kafka.GroupID = viper.GetString("kafka.group_id")
+	config.Kafka.Topics.TaskCreated = viper.GetString("kafka.topics.task_created")
+	config.Kafka.Topics.NewMessage = viper.GetString("kafka.topics.new_message")
+	config.Kafka.Topics.IncomingCall = viper.GetString("kafka.topics.incoming_call")
+	config.Kafka.AutoOffsetReset = viper.GetString("kafka.auto_offset_reset")
+	config.Kafka.EnableAutoCommit = viper.GetBool("kafka.enable_auto_commit")
+	
+	config.FCM.CredentialsPath = viper.GetString("fcm.credentials_path")
+	config.FCM.ProjectID = viper.GetString("fcm.project_id")
+	
+	config.Logger.Level = viper.GetString("logger.level")
+	
+	config.Retry.MaxAttempts = viper.GetInt("retry.max_attempts")
+	config.Retry.DelaySeconds = viper.GetInt("retry.delay_seconds")
 
 	return &config, nil
 }
@@ -131,3 +159,4 @@ func (c *DatabaseConfig) GetDSN() string {
 		c.Host, c.Port, c.User, c.Password, c.DBName, c.SSLMode,
 	)
 }
+

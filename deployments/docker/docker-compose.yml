@@ -62,7 +62,7 @@ services:
       dockerfile: deployments/docker/Dockerfile
     container_name: notification-service
     volumes:
-      - ./corechain-e1321-firebase-adminsdk-fbsvc-a0aa4d8c4c.json:/root/corechain-e1321-firebase-adminsdk-fbsvc-a0aa4d8c4c.json
+      - ./corechain-e1321-firebase-adminsdk-fbsvc-fc8bac45e8.json:/root/corechain-e1321-firebase-adminsdk-fbsvc-fc8bac45e8.json
       - ./config/config.yaml:/app/config/config.yaml
     depends_on:~
       postgres:
@@ -86,7 +86,7 @@ services:
       KAFKA_TOPIC_INCOMING_CALL: call.incoming
       
       # FCM
-      FCM_CREDENTIALS_PATH: /root/corechain-e1321-firebase-adminsdk-fbsvc-a0aa4d8c4c.json
+      FCM_CREDENTIALS_PATH: /root/corechain-e1321-firebase-adminsdk-fbsvc-fc8bac45e8.json
       FCM_PROJECT_ID: corechain-e1321
       
       # Application
