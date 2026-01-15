@@ -26,9 +26,14 @@ WORKDIR /root/
 # Copy binary from builder
 COPY --from=builder /app/notification-service .
 
-# Copy config files
+# Copy config files and Firebase credentials
 COPY --from=builder /app/configs ./configs
-COPY --from=builder /app/google-services.json .
+COPY --from=builder /app/corechain-e1321-firebase-adminsdk-fbsvc-fc8bac45e8.json .
+
+# Add metadata labels
+LABEL maintainer="CoreChain Team"
+LABEL version="1.0.0"
+LABEL description="CoreChain Notification Service - Kafka to FCM notification delivery"
 
 # Expose health check port (optional)
 EXPOSE 8080
