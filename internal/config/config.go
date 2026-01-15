@@ -80,7 +80,7 @@ func Load() (*Config, error) {
 	}
 
 	// Set default values
-	viper.SetDefault("server.port", 8080)
+	viper.SetDefault("server.port", 8000)
 	viper.SetDefault("server.env", "development")
 	viper.SetDefault("logger.level", "info")
 	viper.SetDefault("retry.max_attempts", 3)

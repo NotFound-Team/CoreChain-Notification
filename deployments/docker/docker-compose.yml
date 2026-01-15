@@ -64,7 +64,7 @@ services:
     volumes:
       - ./corechain-e1321-firebase-adminsdk-fbsvc-fc8bac45e8.json:/root/corechain-e1321-firebase-adminsdk-fbsvc-fc8bac45e8.json
       - ./config/config.yaml:/app/config/config.yaml
-    depends_on:~
+    depends_on:
       postgres:
         condition: service_healthy
       kafka:
@@ -92,9 +92,9 @@ services:
       # Application
       APP_ENV: development
       LOG_LEVEL: debug
-      SERVER_PORT: 8080
+      SERVER_PORT: 8000
     ports:
-      - "8080:8080"
+      - "8000:8000"
     networks:
       - notification-network
     restart: unless-stopped
